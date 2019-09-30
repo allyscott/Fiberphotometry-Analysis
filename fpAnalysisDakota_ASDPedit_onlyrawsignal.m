@@ -1224,32 +1224,34 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
         trialDSnum = [currentSubj.numDS];
 
 
-        %define a shared colormap axis for both DS and NS (bottom and top of color range)
-     if currentSubj(i).trainStage==5 
-        bottomblue = min(min(min(DSzblueAllTrials)), min(min(NSzblueAllTrials)));
-        topblue = max(max(max(DSzblueAllTrials)), max(max(NSzblueAllTrials)));
-        %for purple
-        bottompurple = min(min(min(DSzpurpleAllTrials)), min(min(NSzpurpleAllTrials)));
-        toppurple = max(max(max(DSzpurpleAllTrials)), max(max(NSzpurpleAllTrials)));
+        %define a shared colormap axis for both DSblue and DSpurple and NSblue+ NS purple (bottom and top of color range)
+     if  sum(strcmp(fn,'loxNSmat'))==1; 
+        bottomDS = min(min(min(DSzblueAllTrials)), min(min(DSzpurpleAllTrials)));
+        topDS = max(max(max(DSzblueAllTrials)), max(max(DSzpurpleAllTrials)));
+        %for NS
+        bottomNS = min(min(min(NSzblueAllTrials)), min(min(NSzpurpleAllTrials)));
+        topNS = max(max(max(NSzblueAllTrials)), max(max(NSzpurpleAllTrials)));
         
-        %define a shared colormap axis for DS/NS excluding NaN trials TODO: decide if this is a good idea
-        bottomNoNanblue= min(min(min(currentSubjDSzblueSortedNoNan)), min(min(currentSubjNSzblueSortedNoNan)));
-        topNoNanblue= max(max(max(currentSubjDSzblueSortedNoNan)), max(max(currentSubjNSzblueSortedNoNan)));
-        %for purple
-        bottomNoNanpurple= min(min(min(currentSubjDSzpurpleSortedNoNan)), min(min(currentSubjNSzpurpleSortedNoNan)));
-        topNoNanpurple= max(max(max(currentSubjDSzpurpleSortedNoNan)), max(max(currentSubjNSzpurpleSortedNoNan)));
+%         %define a shared colormap axis for DS/NS excluding NaN trials TODO: decide if this is a good idea
+%         bottomNoNanblue= min(min(min(currentSubjDSzblueSortedNoNan)), min(min(currentSubjNSzblueSortedNoNan)));
+%         topNoNanblue= max(max(max(currentSubjDSzblueSortedNoNan)), max(max(currentSubjNSzblueSortedNoNan)));
+%         %for purple
+%         bottomNoNanpurple= min(min(min(currentSubjDSzpurpleSortedNoNan)), min(min(currentSubjNSzpurpleSortedNoNan)));
+%         topNoNanpurple= max(max(max(currentSubjDSzpurpleSortedNoNan)), max(max(currentSubjNSzpurpleSortedNoNan)));
      else % if on lower training stage and still want graph
-         bottomblue = min(min(DSzblueAllTrials));
-         topblue = max(max(DSzblueAllTrials));
-         bottomNoNanblue= min(min(currentSubjDSzblueSortedNoNan));
-         topNoNanblue= max(max(currentSubjDSzblueSortedNoNan));
+        bottomDS = min(min(min(DSzblueAllTrials)), min(min(DSzpurpleAllTrials)));
+        topDS = max(max(max(DSzblueAllTrials)), max(max(DSzpurpleAllTrials)));
+%          bottomblue = min(min(DSzblueAllTrials));
+%          topblue = max(max(DSzblueAllTrials));
+%          bottomNoNanblue= min(min(currentSubjDSzblueSortedNoNan));
+%          topNoNanblue= max(max(currentSubjDSzblueSortedNoNan));
          %for purple
-         bottompurple = min(min(DSzpurpleAllTrials));
-         toppurple= max(max(DSzpurpleAllTrials));
-         bottomNoNanpurple= min(min(currentSubjDSzpurpleSortedNoNan));
-         topNoNanblue= max(max(currentSubjDSzpurpleSortedNoNan));
+%          bottompurple = min(min(DSzpurpleAllTrials));
+%          toppurple= max(max(DSzpurpleAllTrials));
+%          bottomNoNanpurple= min(min(currentSubjDSzpurpleSortedNoNan));
+%          topNoNanblue= max(max(currentSubjDSzpurpleSortedNoNan));
      end
-    %     %PLOT OF AVG CUE RESPONSE PER SESSION
+ %PLOT OF AVG CUE RESPONSE PER SESSION
     %     %DS z plot
         figure; 
         subplot(2,1,1); %subplot for shared colorbar
@@ -1262,66 +1264,58 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
             end
         end
         
-        heatDSz= imagesc(timeLock,subjTrial,DSzblueAllTrials);
+        %plot blue DS
+        heatDSzblue= imagesc(timeLock,subjTrial,DSzblueAllTrials);
         title(strcat('rat ', num2str(ratID), 'avg blue z score response to DS ', '(n= ', num2str(unique(trialDSnum)),')')); %display the possible number of cues in a session (this is why we used unique())
         xlabel('seconds from cue onset');
         ylabel('training day');
         set(gca, 'ytick', subjTrial); %label trials appropriately
         caxis manual;
-        caxis([bottomblue topblue]);
+        caxis([bottomDS topDS]);
         
         c= colorbar; %colorbar legend
-        c.Label.String= strcat('blue z-score calculated from', num2str(slideTime/fs), 's preceding cue');
+        c.Label.String= strcat('DS blue z-score calculated from', num2str(slideTime/fs), 's preceding cue');
         
-        if sum(strcmp(fn,'loxNSmat'))==1; %NS only on stage 5
-        
-        trialNSnum= [currentSubj.numNS];
     
-    %   NSz plot (subplotted for shared colorbar)
+    %   plot purple DS (subplotted for shared colorbar)
         subplot(2,1,2);
-        heatNSz= imagesc(timeLock,stage5trial,NSzblueAllTrials);
+        heatDSzpurple= imagesc(timeLock,subjTrial,DSzpurpleAllTrials);
     
-        title(strcat('rat ', num2str(ratID), ' avg blue z score response to NS ', '(n= ', num2str(unique(trialNSnum)),')')); 
+        title(strcat('rat ', num2str(ratID), ' avg purple z score response to DS ', '(n= ', num2str(unique(trialDSnum)),')')); 
         xlabel('seconds from cue onset');
         ylabel('training day');
       
         set(gca, 'ytick', subjTrial); %TODO: NS trial labels must be different, only stage 5 trials
             
         caxis manual;
-        caxis([bottomblue topblue]);
+        caxis([bottomDS topDS]);
         
         c= colorbar; %colorbar legend
-        c.Label.String= strcat('blue z-score calculated from', num2str(slideTime/fs), 's preceding cue');
-        end
+        c.Label.String= strcat('DS purple z-score calculated from', num2str(slideTime/fs), 's preceding cue');
+        
         %SAVE PLOTS
        set(gcf,'Position', get(0, 'Screensize')); %make the figure full screen before saving
-       saveas(gcf, strcat(figPath,'rat_', num2str(ratID),'_bluemeanZ_perSession','.fig')); %save the current figure in tif format
+       saveas(gcf, strcat(figPath,'rat_', num2str(ratID),'_DSmeanZ_perSession','.fig')); %save the current figure in fig format
 
-       figure; 
+%plot NS blue and purple with shared color bar       
+if sum(strcmp(fn,'loxNSmat'))==1; %NS only on stage 5
+        trialNSnum= [currentSubj.numNS];
+       
+        figure; 
         subplot(2,1,1); %subplot for shared colorbar
         
-        trialCount=0; %counter for loop/indexing
-        for trial= 1:numel(currentSubj)
-            if currentSubj(trial).trainStage==5
-                trialCount=trialCount+1;
-                stage5trial(trialCount) = currentSubj(trial).trainDay;
-            end
-        end
-        
-        heatDSz= imagesc(timeLock,subjTrial,DSzpurpleAllTrials);
-        title(strcat('rat ', num2str(ratID), 'avg purple z score response to DS ', '(n= ', num2str(unique(trialDSnum)),')')); %display the possible number of cues in a session (this is why we used unique())
+        heatNSzblue= imagesc(timeLock,stage5trial,NSzblueAllTrials);
+        title(strcat('rat ', num2str(ratID), 'avg blue z score response to NS ', '(n= ', num2str(unique(trialNSnum)),')')); %display the possible number of cues in a session (this is why we used unique())
         xlabel('seconds from cue onset');
         ylabel('training day');
         set(gca, 'ytick', subjTrial); %label trials appropriately
         caxis manual;
-        caxis([bottompurple toppurple]);
+        caxis([bottomNS topNS]);
         
         c= colorbar; %colorbar legend
-        c.Label.String= strcat('purple z-score calculated from', num2str(slideTime/fs), 's preceding cue');
+        c.Label.String= strcat('NS blue z-score calculated from', num2str(slideTime/fs), 's preceding cue');
         
-       if sum(strcmp(fn,'loxNSmat'))==1; %NS only on stage 5
-        
-        trialNSnum= [currentSubj.numNS];
+       
     
     %   NSz plot (subplotted for shared colorbar)
         subplot(2,1,2);
@@ -1334,14 +1328,15 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
         set(gca, 'ytick', subjTrial); %TODO: NS trial labels must be different, only stage 5 trials
             
         caxis manual;
-        caxis([bottompurple toppurple]);
+        caxis([bottomNS topNS]);
         
         c= colorbar; %colorbar legend
-        c.Label.String= strcat('purple z-score calculated from', num2str(slideTime/fs), 's preceding cue');
-        end
+        c.Label.String= strcat('NS purple z-score calculated from', num2str(slideTime/fs), 's preceding cue');
+end
         %SAVE PLOTS
        set(gcf,'Position', get(0, 'Screensize')); %make the figure full screen before saving
-       saveas(gcf, strcat(figPath,'rat_', num2str(ratID),'_purplemeanZ_perSession','.fig'));
+       saveas(gcf, strcat(figPath,'rat_', num2str(ratID),'_NSmeanZ_perSession','.fig'));
+
     % % %     %add annotation with number of cues for each trial included in analysis- probably can delete
     % % %     textPos= 1/numel(subjTrial)/2;
     % % %     for i=1:numel(subjTrial)
@@ -1432,19 +1427,19 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
     %for blue zscores
       
     figure;
-        subplot(2,1,1); %subplot for shared colorbar
+        subplot(2,1,1); %subplot for shared colorbar for purple and blue DS cue responses
 
         currentSubjDSzblueSortedNoNan = currentSubjDSzblueSortedNoNan.';  %transpose for readability, each row is now 1 cue! 
         imagesc(timeLock, 1:size(currentSubjDSzblueSortedNoNan,1), currentSubjDSzblueSortedNoNan);
 
         caxis manual;
-        caxis([bottomblue topblue]); %TODO: consider using restricted color axis here
+        caxis([bottomDS topDS]); %TODO: consider using restricted color axis here
 
         c= colorbar; %colorbar legend
-        c.Label.String= strcat('Z-score calculated from', num2str(slideTime/fs), 's preceding cue');
+        c.Label.String= strcat('DS blue Z-score calculated from', num2str(slideTime/fs), 's preceding cue');
         xlabel('seconds from cue onset');
         ylabel('cue presentation')
-        title(strcat('rat ', num2str(ratID), ' z score response to every DS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
+        title(strcat('rat ', num2str(ratID), ' blue z score response to every DS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
 
         %overlay plot of PE latency 
         hold on;    
@@ -1460,24 +1455,24 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
 %             s.Marker = '.'; %make the marker a small point
 %         end
 
-        %plot of all NSz- sorted by latency WITH NaN REMOVED
-        if sum(strcmp(fn,'loxNSmat'))==1;
+        %plot of all purple DSz- sorted by latency WITH NaN REMOVED
+        
         subplot(2,1,2); %subplot for shared colorbar
-        currentSubjNSzblueSortedNoNan = currentSubjNSzblueSortedNoNan.';  %transpose for readability, each row is now 1 cue! 
-        imagesc(timeLock, 1:size(currentSubjNSzblueSortedNoNan,1), currentSubjNSzblueSortedNoNan);
+        currentSubjDSzpurpleSortedNoNan = currentSubjDSzpurpleSortedNoNan.';  %transpose for readability, each row is now 1 cue! 
+        imagesc(timeLock, 1:size(currentSubjDSzpurpleSortedNoNan,1), currentSubjDSzpurpleSortedNoNan);
         
         caxis manual;
-        caxis([bottomblue topblue]);
+        caxis([bottomDS topDS]);
 
         c= colorbar; %colorbar legend
         c.Label.String= strcat('Z-score calculated from', num2str(slideTime/fs), 's preceding cue');
         xlabel('seconds from cue onset');
         ylabel('cue presentation')
-        title(strcat('rat ', num2str(ratID), ' z score response to every NS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
+        title(strcat('rat ', num2str(ratID), ' purple z score response to every DS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
        
         %overlay plot of PE latency 
         hold on;    
-        s= scatter(currentSubjpoxNSlatencySorted, 1:numel(currentSubjpoxNSlatencySorted), 'm');
+        s= scatter(currentSubjpoxDSlatencySorted, 1:numel(currentSubjpoxDSlatencySorted), 'm');
         s.Marker= '.';
        
         
@@ -1490,29 +1485,33 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
 %             s= scatter(currentSubjloxNSSortedNoNan{trial}, currentTrial, 'k'); %scatter plot the licks for each trial
 %             s.Marker = '.'; %make the marker a small point
 %         end
-        end
+        
         %SAVE PLOTS
         set(gcf,'Position', get(0, 'Screensize')); %make the figure full screen before saving
-        saveas(gcf, strcat(figPath,'Trials3and4and5_rat_', num2str(ratID),'_blueZscore_AllCuesSorted','.fig')); %save the current figure in tif format
-% for purple z scores
+        saveas(gcf, strcat(figPath,'Trials3and4and5_rat_', num2str(ratID),'_DSZscore_AllCuesSorted','.fig')); %save the current figure in tif format
+
+% plot NS purple and blue responses with shared colorbar
+       if sum(strcmp(fn,'loxNSmat'))==1;
+        
+           % for blue NS z scores
         figure;
         subplot(2,1,1); %subplot for shared colorbar
 
-        currentSubjDSzpurpleSortedNoNan = currentSubjDSzpurpleSortedNoNan.';  %transpose for readability, each row is now 1 cue! 
-        imagesc(timeLock, 1:size(currentSubjDSzpurpleSortedNoNan,1), currentSubjDSzpurpleSortedNoNan);
+        currentSubjNSzblueSortedNoNan = currentSubjNSzblueSortedNoNan.';  %transpose for readability, each row is now 1 cue! 
+        imagesc(timeLock, 1:size(currentSubjNSzblueSortedNoNan,1), currentSubjNSzblueSortedNoNan);
 
         caxis manual;
-        caxis([bottompurple toppurple]); %TODO: consider using restricted color axis here
+        caxis([bottomNS topNS]); %TODO: consider using restricted color axis here
 
         c= colorbar; %colorbar legend
         c.Label.String= strcat('Z-score calculated from', num2str(slideTime/fs), 's preceding cue');
         xlabel('seconds from cue onset');
         ylabel('cue presentation')
-        title(strcat('rat ', num2str(ratID), ' z score response to every DS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
+        title(strcat('rat ', num2str(ratID), ' blue z score response to every NS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
 
         %overlay plot of PE latency 
         hold on;    
-        s= scatter(currentSubjpoxDSlatencySorted, 1:numel(currentSubjpoxDSlatencySorted), 'm');
+        s= scatter(currentSubjpoxNSlatencySorted, 1:numel(currentSubjpoxNSlatencySorted), 'm');
         s.Marker= '.';
 
         %overlay plot of licks surrounding DS - a little more complicated because this is a cell array with an unknown number of licks per cue
@@ -1524,20 +1523,20 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
 %             s.Marker = '.'; %make the marker a small point
 %         end
 
-        %plot of all NSz- sorted by latency WITH NaN REMOVED
-        if sum(strcmp(fn,'loxNSmat'))==1;
+        %plot of all purple NSz- sorted by latency WITH NaN REMOVED
+        
         subplot(2,1,2); %subplot for shared colorbar
         currentSubjNSzpurpleSortedNoNan = currentSubjNSzpurpleSortedNoNan.';  %transpose for readability, each row is now 1 cue! 
         imagesc(timeLock, 1:size(currentSubjNSzpurpleSortedNoNan,1), currentSubjNSzpurpleSortedNoNan);
         
         caxis manual;
-        caxis([bottompurple toppurple]);
+        caxis([bottomNS topNS]);
 
         c= colorbar; %colorbar legend
         c.Label.String= strcat('Z-score calculated from', num2str(slideTime/fs), 's preceding cue');
         xlabel('seconds from cue onset');
         ylabel('cue presentation')
-        title(strcat('rat ', num2str(ratID), ' z score response to every NS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
+        title(strcat('rat ', num2str(ratID), ' purple z score response to every NS cue SORTED BY LATENCY (Lo-Hi; NaN removed)'));
        
         %overlay plot of PE latency 
         hold on;    
@@ -1554,11 +1553,11 @@ if runAnalysis ==1 %only run this if all sessions loaded are from valid DS train
 %             s= scatter(currentSubjloxNSSortedNoNan{trial}, currentTrial, 'k'); %scatter plot the licks for each trial
 %             s.Marker = '.'; %make the marker a small point
 %         end
-        end
+        
         %SAVE PLOTS
         set(gcf,'Position', get(0, 'Screensize')); %make the figure full screen before saving
-        saveas(gcf, strcat(figPath,'Trials3and4and5_rat_', num2str(ratID),'_purpleZscore_AllCuesSorted','.fig')); %save the current figure in tif format
-
+        saveas(gcf, strcat(figPath,'Trials3and4and5_rat_', num2str(ratID),'_NSZscore_AllCuesSorted','.fig')); %save the current figure in tif format
+end
         %     %%%%%%%%%%%%%%%%%%%%%%%%%%% IN PROGRESS- visualizing lox
     % 
     %     %PLOT OF ALL LICKS SURROUNDING EACH INDIVIDUAL CUE PRESENTATION- TRIALS SORTED BY PE LATENCY, only including trials in which a PE was made
